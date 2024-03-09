@@ -1,7 +1,8 @@
-import {Injectable, Signal, signal} from '@angular/core';
+import {Injectable, Signal, effect, signal} from '@angular/core';
 import {Observable} from 'rxjs';
 
 import {HttpClient} from '@angular/common/http';
+import { LocationService } from './location.service';
 import {CurrentConditions} from './current-conditions/current-conditions.type';
 import {ConditionsAndZip} from './conditions-and-zip.type';
 import {Forecast} from './forecasts-list/forecast.type';
@@ -13,8 +14,37 @@ export class WeatherService {
   static APPID = '5a4b2d457ecbef9eb2a71e480b947604';
   static ICON_URL = 'https://raw.githubusercontent.com/udacity/Sunshine-Version-2/sunshine_master/app/src/main/res/drawable-hdpi/';
   private currentConditions = signal<ConditionsAndZip[]>([]);
+  private currentLocations: string[] = [];
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private locationService: LocationService) {
+    // Adding locations already saved on localstorage
+    this.currentLocations = this.locationService.locations();
+    if (this.currentLocations) {
+      for (let loc of this.currentLocations) {
+        this.addCurrentConditions(loc);
+      }
+    }
+
+    // Listening for changes on the locations list
+    effect(() => {
+      let newLocations: string[] = this.locationService.locations();
+      
+      let changes: string[] = this.currentLocations.filter(loc => !newLocations.includes(loc))
+                        .concat(newLocations.filter(loc => !this.currentLocations.includes(loc)));
+
+      if (changes) {
+        if (this.currentLocations.length > newLocations.length) {
+          this.removeCurrentConditions(changes.pop());
+        }
+        if (newLocations.length > this.currentLocations.length) {
+          this.addCurrentConditions(changes.pop());
+        }
+
+        this.currentLocations = newLocations;
+      }
+    }, {allowSignalWrites: true});
+  }
+
 
   addCurrentConditions(zipcode: string): void {
     // Here we make a request to get the current conditions data from the API. Note the use of backticks and an expression to insert the zipcode
