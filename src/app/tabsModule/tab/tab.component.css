@@ -1,0 +1,10 @@
+.tab-content {
+  border: 1px solid #ccc;
+  background-color: #eee;
+  padding: 10px;
+}
+.flex {
+  display: flex;
+  justify-content: space-around;
+  width: 600px;
+}
