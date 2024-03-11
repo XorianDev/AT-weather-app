@@ -1,0 +1,25 @@
+.tabs {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+}
+.tabs li {
+  gap: 1;
+  background-color: #234ca5;
+  color: #ddd;
+  padding: 5px 10px;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  border-bottom: none;
+}
+.tabs li.active {
+  color: white;
+  background-color: #386bda
+}
+
+.close {
+  color: red;
+  margin-left: 10px;
+  cursor: pointer;
+}
