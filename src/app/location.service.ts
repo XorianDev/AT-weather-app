@@ -18,6 +18,8 @@ export class LocationService {
   }
 
   addLocation(zipcode : string) {
+    const locAlreadyAdded: boolean = this.locations().some(loc => loc === zipcode);
+    if (locAlreadyAdded) return;
     this.locationsSignal.update(locations => [...locations, zipcode]);
     localStorage.setItem(LOCATIONS, JSON.stringify(this.locations()));
   }
