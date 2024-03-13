@@ -1,6 +1,6 @@
 import {Injectable, Signal, effect, signal} from '@angular/core';
 import {Observable, of} from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { take, tap } from 'rxjs/operators';
 
 import {HttpClient} from '@angular/common/http';
 import { LocationService } from './location.service';
@@ -59,6 +59,7 @@ export class WeatherService {
     } else {
       // Here we make a request to get the current conditions data from the API. Note the use of backticks and an expression to insert the zipcode
       this.http.get<CurrentConditions>(`${WeatherService.URL}/weather?zip=${zipcode},us&units=imperial&APPID=${WeatherService.APPID}`)
+      .pipe(take(1))
       .subscribe(data => {
         this.currentConditions.update(conditions => [...conditions, {zip: zipcode, data}]);
         this.cacheService.save(key, data);

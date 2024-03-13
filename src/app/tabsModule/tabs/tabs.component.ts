@@ -1,4 +1,5 @@
 import { Component, ContentChildren, QueryList, AfterContentChecked, EventEmitter, Output } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { TabComponent } from '../tab/tab.component';
 
 @Component({
@@ -7,20 +8,20 @@ import { TabComponent } from '../tab/tab.component';
   styleUrls: ['./tabs.component.css']
 })
 export class TabsComponent implements AfterContentChecked {
-  @ContentChildren(TabComponent) tabs: QueryList<TabComponent> = QueryList.prototype;
+  @ContentChildren(TabComponent) tabs: QueryList<TabComponent>;
   @Output() tabCloseAction = new EventEmitter<TabComponent>();
 
-  private _tabActiveByDefault: boolean = false;
+  private _tabActiveByDefault: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   ngAfterContentChecked(): void {
-    if (!this._tabActiveByDefault && this.tabs.length > 0) {
+    if (!this._tabActiveByDefault.value && this.tabs.length > 0) {
       const activeTab = this.tabs.filter(tab => tab.isActive);
       if (activeTab.length === 0) {
-        // setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
-        setTimeout(() => {
+        // Promise.resolve to avoid ExpressionChangedAfterItHasBeenCheckedError
+        Promise.resolve().then(() => {
           this.selectTab(this.tabs.first);
-          this._tabActiveByDefault = true;
-        }, 0);
+          this._tabActiveByDefault.next(true);
+        });
       }
     }
   }
@@ -39,7 +40,7 @@ export class TabsComponent implements AfterContentChecked {
     if (this.tabs.length > 0) {
       this.selectTab(this.tabs.first);
     } else {
-      this._tabActiveByDefault = false;
+      this._tabActiveByDefault.next(false);
     }
   }
 }
