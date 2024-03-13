@@ -3,7 +3,7 @@ import {WeatherService} from "../weather.service";
 import {LocationService} from "../location.service";
 import {Router} from "@angular/router";
 import {ConditionsAndZip} from '../conditions-and-zip.type';
-import { TabComponent } from 'app/tabsModule/tab/tab.component';
+import { TabComponent } from '../tabsModule/tab/tab.component';
 
 @Component({
   selector: 'app-current-conditions',
