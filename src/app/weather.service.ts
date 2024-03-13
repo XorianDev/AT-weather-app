@@ -53,7 +53,7 @@ export class WeatherService {
 
   addCurrentConditions(zipcode: string): void {
     const key: string = `conditions_${zipcode}`;
-    const cachedData = this.cacheService.get(key) as CurrentConditions;
+    const cachedData = this.cacheService.get<CurrentConditions>(key);
     if (cachedData) {
       this.currentConditions.update(conditions => [...conditions, { zip: zipcode, data: cachedData }]);
     } else {
@@ -61,7 +61,7 @@ export class WeatherService {
       this.http.get<CurrentConditions>(`${WeatherService.URL}/weather?zip=${zipcode},us&units=imperial&APPID=${WeatherService.APPID}`)
       .subscribe(data => {
         this.currentConditions.update(conditions => [...conditions, {zip: zipcode, data}]);
-        this.cacheService.save(key, data);
+        this.cacheService.save<CurrentConditions>(key, data);
       });
     }
   }
@@ -82,13 +82,13 @@ export class WeatherService {
 
   getForecast(zipcode: string): Observable<Forecast> {
     const key: string = `forecast_${zipcode}`;
-    const cachedData = this.cacheService.get(key) as Forecast;
+    const cachedData = this.cacheService.get<Forecast>(key);
     if (cachedData) return of(cachedData);
     // Here we make a request to get the forecast data from the API. Note the use of backticks and an expression to insert the zipcode
     return this.http.get<Forecast>(`${WeatherService.URL}/forecast/daily?zip=${zipcode},us&units=imperial&cnt=5&APPID=${WeatherService.APPID}`).
       pipe(
         tap(
-          forecast => this.cacheService.save(key, forecast)
+          forecast => this.cacheService.save<Forecast>(key, forecast)
         )
       );
   }
